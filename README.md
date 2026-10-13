@@ -7,7 +7,9 @@ configuración de RViz2.
 
 **Integrantes:** Andrés Ramírez · Simón Patiño
 
-![Pista](docs/pista_vista_superior.png)
+![Robot en la pista](docs/robot_en_pista.png)
+
+Video de una vuelta completa (x3): [docs/recorrido_pista.mp4](docs/recorrido_pista.mp4)
 
 ## Estructura
 
@@ -104,6 +106,8 @@ map ─(map_tf_node)─> odom ─(DiffDrive)─> base_footprint ─> base_link �
 ```
 
 ## Pista
+
+![Pista](docs/pista_vista_superior.png)
 
 La pista se genera con `tools/generar_pista.py` (no editar el `.sdf` a mano):
 
