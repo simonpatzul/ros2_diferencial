@@ -16,13 +16,16 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         # 2. Copiar archivos URDF / XACRO
         (os.path.join('share', package_name, 'urdf'), glob('urdf/*.xacro')),
+        # 3. Copiar world de la pista y configuración de RViz
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
+        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='andarraz',
     maintainer_email='andarraz@todo.todo',
     description='Robot Diferencial con Cinematica Propia',
-    license='TODO: License declaration',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
@@ -30,7 +33,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            # 3. Registrar el nodo ejecutable
+            # 4. Registrar el nodo ejecutable
             'kinematics_node = mi_robot_diferencial.kinematics_node:main',
         ],
     },

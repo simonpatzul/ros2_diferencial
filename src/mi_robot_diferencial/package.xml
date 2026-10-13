@@ -3,9 +3,9 @@
 <package format="3">
   <name>mi_robot_diferencial</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Robot diferencial (Yahboom 4WD) en Gazebo Sim con LiDAR, cámara, pista propia y nodo de cinemática de llantas</description>
   <maintainer email="andarraz@todo.todo">andarraz</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
   <depend>geometry_msgs</depend>
@@ -13,6 +13,13 @@
   <depend>nav_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>std_msgs</depend>
+
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
