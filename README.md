@@ -9,8 +9,6 @@ configuración de RViz2.
 
 ![Robot en la pista](docs/robot_en_pista.png)
 
-Video de una vuelta completa (x3): [docs/recorrido_pista.mp4](docs/recorrido_pista.mp4)
-
 ## Estructura
 
 ```
