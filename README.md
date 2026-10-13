@@ -5,6 +5,8 @@ Sim (Harmonic) con ROS 2 Jazzy. Incluye una pista propia, un nodo de cinemática
 de llantas que compara su odometría con la del plugin DiffDrive, y una
 configuración de RViz2.
 
+**Integrantes:** Andrés Ramírez · Simón Patiño
+
 ![Pista](docs/pista_vista_superior.png)
 
 ## Estructura
