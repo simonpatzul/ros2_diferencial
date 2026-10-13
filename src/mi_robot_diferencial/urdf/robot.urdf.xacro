@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<robot name="yahboom_microros_4wd" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ==================== PARÁMETROS FÍSICOS YAHBOOM 4WD ==================== -->
+  <xacro:property name="chasis_largo" value="0.238"/>
+  <xacro:property name="chasis_ancho" value="0.160"/>
+  <xacro:property name="chasis_alto" value="0.075"/>
+  <xacro:property name="chasis_masa" value="1.2"/>
+
+  <!-- Neumáticos 48mm x 21.5mm (Llantas convencionales Yahboom) -->
+  <xacro:property name="rueda_radio" value="0.024"/>
+  <xacro:property name="rueda_ancho" value="0.0215"/>
+  <xacro:property name="separacion_ruedas" value="0.180"/>
+  <xacro:property name="distancia_ejes" value="0.140"/>
+  <xacro:property name="rueda_masa" value="0.08"/>
+
+  <!-- ==================== BASE FOOTPRINT & BASE LINK ==================== -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${rueda_radio}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 ${chasis_alto/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chasis_largo} ${chasis_ancho} ${chasis_alto}"/>
+      </geometry>
+      <material name="aluminio_negro_yahboom">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${chasis_alto/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chasis_largo} ${chasis_ancho} ${chasis_alto}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 ${chasis_alto/2}" rpy="0 0 0"/>
+      <mass value="${chasis_masa}"/>
+      <inertia 
+        ixx="${(1/12)*chasis_masa*(chasis_ancho*chasis_ancho + chasis_alto*chasis_alto)}" ixy="0.0" ixz="0.0"
+        iyy="${(1/12)*chasis_masa*(chasis_largo*chasis_largo + chasis_alto*chasis_alto)}" iyz="0.0"
+        izz="${(1/12)*chasis_masa*(chasis_largo*chasis_largo + chasis_ancho*chasis_ancho)}"/>
+    </inertial>
+  </link>
+
+  <!-- ==================== MACRO DE LAS 4 RUEDAS ==================== -->
+  <xacro:macro name="rueda" params="prefijo x_signo y_signo">
+    <link name="rueda_${prefijo}">
+      <visual>
+        <geometry>
+          <cylinder radius="${rueda_radio}" length="${rueda_ancho}"/>
+        </geometry>
+        <material name="goma_negra">
+          <color rgba="0.05 0.05 0.05 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${rueda_radio}" length="${rueda_ancho}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${rueda_masa}"/>
+        <inertia 
+          ixx="${(1/12)*rueda_masa*(3*rueda_radio*rueda_radio + rueda_ancho*rueda_ancho)}" ixy="0.0" ixz="0.0"
+          iyy="${(1/12)*rueda_masa*(3*rueda_radio*rueda_radio + rueda_ancho*rueda_ancho)}" iyz="0.0"
+          izz="${(1/2)*rueda_masa*rueda_radio*rueda_radio}"/>
+      </inertial>
+    </link>
+
+    <joint name="joint_rueda_${prefijo}" type="continuous">
+      <parent link="base_link"/>
+      <child link="rueda_${prefijo}"/>
+      <origin xyz="${x_signo * distancia_ejes/2} ${y_signo * separacion_ruedas/2} 0" rpy="-1.5708 0 0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <gazebo reference="rueda_${prefijo}">
+      <mu1>0.6</mu1>
+      <mu2>0.6</mu2>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:rueda prefijo="del_izq" x_signo="1" y_signo="1"/>
+  <xacro:rueda prefijo="del_der" x_signo="1" y_signo="-1"/>
+  <xacro:rueda prefijo="tra_izq" x_signo="-1" y_signo="1"/>
+  <xacro:rueda prefijo="tra_der" x_signo="-1" y_signo="-1"/>
+
+  <!-- ==================== SENSOR LIDAR MS200 ==================== -->
+  <link name="lidar_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.025" length="0.025"/>
+      </geometry>
+      <material name="azul_yahboom">
+        <color rgba="0.0 0.4 0.8 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.025" length="0.025"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.08"/>
+      <inertia ixx="1e-4" ixy="0" ixz="0" iyy="1e-4" iyz="0" izz="1e-4"/>
+    </inertial>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="0.01 0 ${chasis_alto + 0.0125}" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="lidar_link">
+    <sensor name="gpu_lidar" type="gpu_lidar">
+      <update_rate>10</update_rate>
+      <topic>/scan</topic>
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+  <!-- ==================== CÁMARA FRONTAL YAHBOOM ==================== -->
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.015 0.035 0.02"/>
+      </geometry>
+      <material name="rojo_camara">
+        <color rgba="0.8 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.015 0.035 0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.04"/>
+      <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${chasis_largo/2} 0 ${chasis_alto/2}" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="camera_link">
+    <sensor name="camera" type="camera">
+      <update_rate>30</update_rate>
+      <topic>/camera/image_raw</topic>
+      <gz_frame_id>camera_link</gz_frame_id>
+      <camera>
+        <horizontal_fov>1.85</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.03</near>
+          <far>10.0</far>
+        </clip>
+      </camera>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+  <!-- ==================== PLUGINS GAZEBO SIM ==================== -->
+  <gazebo>
+    <!-- Plugin DiffDrive adaptado para Skid-Steering (4 ruedas) -->
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>joint_rueda_del_izq</left_joint>
+      <left_joint>joint_rueda_tra_izq</left_joint>
+      <right_joint>joint_rueda_del_der</right_joint>
+      <right_joint>joint_rueda_tra_der</right_joint>
+      <wheel_separation>${separacion_ruedas}</wheel_separation>
+      <wheel_radius>${rueda_radio}</wheel_radius>
+      <odom_publish_frequency>30</odom_publish_frequency>
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+    </plugin>
+
+    <!-- Publicador de estados de articulaciones -->
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>/joint_states</topic>
+    </plugin>
+
+    <!-- Sistema de sensores -->
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+  </gazebo>
+
+</robot>
