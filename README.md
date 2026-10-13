@@ -39,7 +39,7 @@ sudo apt install ros-jazzy-ros-gz ros-jazzy-xacro ros-jazzy-robot-state-publishe
 ## Compilación
 
 ```bash
-git clone <URL_DEL_REPO> ~/ros2_diferencial
+git clone https://github.com/simonpatzul/ros2_diferencial.git ~/ros2_diferencial
 cd ~/ros2_diferencial
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install
