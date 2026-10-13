@@ -20,7 +20,8 @@ ros2_diferencial/
     ├── worlds/pista.sdf          # Pista propia (generada)
     ├── rviz/robot.rviz           # Configuración de RViz2
     ├── mi_robot_diferencial/
-    │   └── kinematics_node.py    # Cinemática de llantas: w -> u -> q̇, integra q y reporta error
+    │   ├── kinematics_node.py    # Cinemática de llantas: w -> u -> q̇, integra q y reporta error
+    │   └── map_tf_node.py        # TF map -> odom con la pose real (frame fijo para RViz)
     └── tools/
         ├── generar_pista.py      # Genera worlds/pista.sdf a partir de la línea central
         ├── plot_pista.py         # Vista superior de la pista
@@ -90,6 +91,17 @@ ros2 topic echo /kinematics/position_error
 | `/camera/camera_info` | `sensor_msgs/CameraInfo` | Gazebo → ROS |
 | `/kinematics/odom` | `nav_msgs/Odometry` | Nodo propio |
 | `/kinematics/position_error` | `std_msgs/Float64` | Nodo propio |
+
+### Frames y RViz
+
+RViz usa `map` como frame fijo. `map_tf_node` publica `map → odom` con la pose
+real del simulador (`/ground_truth/odom`), así la pista y el LiDAR se quedan
+quietos aunque la odometría por ruedas derive al girar (derrape del 4WD).
+El TF `odom → base_footprint` sigue siendo el del plugin DiffDrive.
+
+```
+map ─(map_tf_node)─> odom ─(DiffDrive)─> base_footprint ─> base_link ─> ruedas, lidar_link, camera_link
+```
 
 ## Pista
 

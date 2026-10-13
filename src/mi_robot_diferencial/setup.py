@@ -35,6 +35,7 @@ setup(
         'console_scripts': [
             # 4. Registrar el nodo ejecutable
             'kinematics_node = mi_robot_diferencial.kinematics_node:main',
+            'map_tf_node = mi_robot_diferencial.map_tf_node:main',
         ],
     },
 )

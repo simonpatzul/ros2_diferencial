@@ -99,6 +99,14 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
+    # Frame fijo map -> odom (corrige la deriva de la odometría en RViz)
+    node_map_tf = Node(
+        package='mi_robot_diferencial',
+        executable='map_tf_node',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+
     # RViz2
     rviz = Node(
         package='rviz2',
@@ -116,5 +124,6 @@ def generate_launch_description():
         spawn_entity,
         bridge,
         node_kinematics,
+        node_map_tf,
         rviz
     ])
